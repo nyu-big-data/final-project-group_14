@@ -10,7 +10,13 @@ Created on Sun Apr 24 15:25:28 2022
 
 #Use getpass to obtain user netID
 import getpass
+import math
+from pyspark.sql import functions as F
+from pyspark.sql.window import Window
+from pyspark.sql import SparkSession
 
+from pyspark.sql import Row
+from pyspark.sql import SparkSession
 
 # And pyspark.sql to get the spark session
 from pyspark.sql import SparkSession
@@ -27,7 +33,7 @@ def main(spark):
 
     # Load the boats.txt and sailors.json data into DataFrame
     movie_ratings = spark.read.csv('hdfs:/user/sa6523/ratings.csv').rdd
-    parts = lines.map(lambda row: row.value.split("::"))
+    parts = movie_ratings.map(lambda row: row.value.split("::"))
     ratingsRDD = parts.map(lambda p: Row(userId=int(p[0]), movieId=int(p[1]),
                                         rating=float(p[2]), timestamp=int(p[3])))
     ratings = spark.createDataFrame(ratingsRDD)
