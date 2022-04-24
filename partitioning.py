@@ -32,11 +32,8 @@ def main(spark):
 
 
     # Load the boats.txt and sailors.json data into DataFrame
-    movie_ratings = spark.read.csv('hdfs:/user/sa6523/ratings.csv').rdd
-    parts = movie_ratings.map(lambda row: row.value.split("::"))
-    ratingsRDD = parts.map(lambda p: Row(userId=int(p[0]), movieId=int(p[1]),
-                                        rating=float(p[2]), timestamp=int(p[3])))
-    ratings = spark.createDataFrame(ratingsRDD)
+    movie_ratings = spark.read.csv('hdfs:/user/sa6523/ratings.csv')
+    ratings = spark.createDataFrame(movie_ratings)
     ratings.show()
     
    
