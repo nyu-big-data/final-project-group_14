@@ -26,10 +26,12 @@ def main(spark):
 
 
     # Load the boats.txt and sailors.json data into DataFrame
-    movie_ratings = spark.read.csv('hdfs:/user/sr6172/ratings.csv',schema = 'userId STRING, movieId STRING, rating STRING, timestamp STRING')
-    movie_ratings.createOrReplaceTempView('movie_ratings')
-    res_1 = spark.sql('SELECT * from movie_ratings')
-    res_1.show()
+    movie_ratings = spark.read.csv('hdfs:/user/sa6523/ratings.csv').rdd
+    parts = lines.map(lambda row: row.value.split("::"))
+    ratingsRDD = parts.map(lambda p: Row(userId=int(p[0]), movieId=int(p[1]),
+                                        rating=float(p[2]), timestamp=int(p[3])))
+    ratings = spark.createDataFrame(ratingsRDD)
+    ratings.show()
     
    
 
