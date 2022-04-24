@@ -33,8 +33,7 @@ def main(spark):
 
     # Load the boats.txt and sailors.json data into DataFrame
     movie_ratings = spark.read.csv('hdfs:/user/sa6523/ratings.csv')
-    ratings = spark.createDataFrame(movie_ratings)
-    ratings.show()
+    movie_ratings.show()
     
    
 
