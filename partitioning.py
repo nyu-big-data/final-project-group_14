@@ -26,7 +26,7 @@ def main(spark):
 
 
     # Load the boats.txt and sailors.json data into DataFrame
-    movie_ratings = spark.read.csv('hdfs:/user/sr6172/movielens/ml-lastest-small/ratings.csv',schema = 'userId STRING, movieId STRING, rating STRING, timestamp STRING')
+    movie_ratings = spark.read.csv('hdfs:/user/sr6172/ratings.csv',schema = 'userId STRING, movieId STRING, rating STRING, timestamp STRING')
     movie_ratings.createOrReplaceTempView('movie_ratings')
     res_1 = spark.sql('SELECT * from movie_ratings')
     res_1.show()
