@@ -33,7 +33,7 @@ def main(spark):
     movie_ratings.show()
     
     movie_ratings.groupBy("userId").count().show()
-    train=movie_ratings.sampleBy("userId", fractions={1: 0.6, 2: 0.6, 3: 0.6}, seed=10)
+    train=movie_ratings.sampleBy("userId", fractions={i: 0.6 for i in range(1,611)}, seed=1234)
     
     train.groupBy("userId").count().show()
     train.show()
@@ -44,7 +44,7 @@ def main(spark):
     test.orderBy('userId').show()
     
     #window = Window.partitionBy('userId').orderBy('')
-    test = test.select('userId','movieId','rating','timestamp', F.row_number().over(window).alias("row_number"))
+    #test = test.select('userId','movieId','rating','timestamp', F.row_number().over(window).alias("row_number"))
     
     test_split = test.filter(test.userId % 2 == 1)
     val_split = test.filter(test.userId % 2 == 0)
