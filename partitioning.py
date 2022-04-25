@@ -40,6 +40,7 @@ def main(spark):
     train.show()
     test=movie_ratings.subtract(train)
     test.groupBy("userID").count().show()
+    test.show()
 
 # Only enter this block if we're in main
 if __name__ == "__main__":
