@@ -32,8 +32,9 @@ def main(spark):
 
 
     # Load the boats.txt and sailors.json data into DataFrame
-    movie_ratings = spark.read.csv('hdfs:/user/sa6523/ratings.csv')
+    movie_ratings = spark.read.csv('hdfs:/user/sa6523/ratings.csv',header=True, schema='userId INT, movieId INT, ratings FLOAT, timestamp INT')
     movie_ratings.show()
+    movie_ratings.groupBy("userID").count().show()
     
    
 
