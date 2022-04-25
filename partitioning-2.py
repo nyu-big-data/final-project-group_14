@@ -13,11 +13,7 @@ import getpass
 import math
 from pyspark.sql import functions as F
 from pyspark.sql.window import Window
-from pyspark.sql import SparkSession
-
 from pyspark.sql import Row
-from pyspark.sql import SparkSession
-
 # And pyspark.sql to get the spark session
 from pyspark.sql import SparkSession
 
@@ -32,15 +28,32 @@ def main(spark):
 
 
     # Load the boats.txt and sailors.json data into DataFrame
-    movie_ratings = spark.read.csv('hdfs:/user/sa6523/ratings.csv',header=True, schema='userId INT, movieId INT, ratings FLOAT, timestamp INT')
+
+    movie_ratings = spark.read.csv('hdfs:/user/sa6523/ratings.csv', header = True ,schema = 'userId STRING, movieId STRING, rating STRING, timestamp STRING')
     movie_ratings.show()
+    
     movie_ratings.groupBy("userId").count().show()
     train=movie_ratings.sampleBy("userId", fractions={i: 0.6 for i in range(1,611)}, seed=10)
+    
     train.groupBy("userId").count().show()
     train.show()
+    
     test=movie_ratings.subtract(train)
     test.groupBy("userId").count().show()
-    test.orderBy('userId').show()
+    
+    #test.orderBy('userId').show()
+    
+    #window = Window.partitionBy('userId').orderBy('')
+    #test = test.select('userId','movieId','rating','timestamp', F.row_number().over(window).alias("row_number"))
+    
+    test_split = test.filter(test.userId % 2 == 1)
+    val_split = test.filter(test.userId % 2 == 0)
+    
+    test_split.show()
+    val_split.show()
+
+    
+
 
 # Only enter this block if we're in main
 if __name__ == "__main__":
