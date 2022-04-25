@@ -37,6 +37,7 @@ def main(spark):
     movie_ratings.groupBy("userID").count().show()
     train=movie_ratings.sampleBy("userID", fractions={i: 0.6 for i in range(1,611)}, seed=10)
     train.groupBy("userID").count().show()
+    train.show()
     test=movie_ratings.subtract(train)
     test.groupBy("userID").count().show()
 
