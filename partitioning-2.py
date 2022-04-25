@@ -33,7 +33,11 @@ def main(spark):
 
     # Load the boats.txt and sailors.json data into DataFrame
 <<<<<<< HEAD
+<<<<<<< HEAD
     movie_ratings = spark.read.csv('hdfs:/user/sr6172/ratings.csv', header = True ,schema = 'userId STRING, movieId STRING, rating STRING, timestamp STRING')
+=======
+    movie_ratings = spark.read.csv('hdfs:/user/sa6523/ratings.csv',header=True, schema='userId INT, movieId INT, ratings FLOAT, timestamp INT')
+>>>>>>> 894d16064fa03ea27321cfa8eacf088e9b655eee
 =======
     movie_ratings = spark.read.csv('hdfs:/user/sa6523/ratings.csv',header=True, schema='userId INT, movieId INT, ratings FLOAT, timestamp INT')
 >>>>>>> 894d16064fa03ea27321cfa8eacf088e9b655eee
@@ -46,11 +50,14 @@ def main(spark):
     test.groupBy("userID").count().show()
     test.orderBy('userId').show()
 <<<<<<< HEAD
+<<<<<<< HEAD
     
     
     
    
 
+=======
+>>>>>>> 894d16064fa03ea27321cfa8eacf088e9b655eee
 =======
 >>>>>>> 894d16064fa03ea27321cfa8eacf088e9b655eee
 
