@@ -46,11 +46,11 @@ def main(spark):
     #window = Window.partitionBy('userId').orderBy('')
     #test = test.select('userId','movieId','rating','timestamp', F.row_number().over(window).alias("row_number"))
     
-    test_split = test.filter(test.userId % 2 == 1)
-    val_split = test.filter(test.userId % 2 == 0)
+    #test_split = test.filter(test.userId % 2 == 1)
+    #val_split = test.filter(test.userId % 2 == 0)
     
-    test_split.show()
-    val_split.show()
+    #test_split.show()
+    #val_split.show()
 
     
 
