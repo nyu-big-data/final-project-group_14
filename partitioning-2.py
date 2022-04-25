@@ -31,13 +31,28 @@ def main(spark):
 
     movie_ratings = spark.read.csv('hdfs:/user/sr6172/ratings.csv', header = True ,schema = 'userId STRING, movieId STRING, rating STRING, timestamp STRING')
     movie_ratings.show()
-    movie_ratings.groupBy("userID").count().show()
-    train=movie_ratings.sampleBy("userID", fractions={i: 0.6 for i in range(1,611)}, seed=10)
-    train.groupBy("userID").count().show()
+    
+    movie_ratings.groupBy("userId").count().show()
+    train=movie_ratings.sampleBy("userId", fractions={i: 0.6 for i in range(1,611)}, seed=10)
+    
+    train.groupBy("userId").count().show()
     train.show()
+    
     test=movie_ratings.subtract(train)
-    test.groupBy("userID").count().show()
-    test.orderBy('userId').show()
+    test.groupBy("userId").count().show()
+    
+    #test.orderBy('userId').show()
+    
+    window = Window.partitionBy('userId')
+    test = test.select('userId','movieId','rating','timestamp', F.row_number().over(window).alias("row_number"))
+    
+    test_split = test.filter(test.row_number % 2 == 1).drop('row_number')
+    val_split = test.filter(test.row_number % 2 == 0).drop('row_number')
+    
+    test_split.show()
+    val_split.show()
+
+    
 
 
 # Only enter this block if we're in main
