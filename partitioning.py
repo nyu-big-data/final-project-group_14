@@ -39,7 +39,7 @@ def main(spark):
     train.groupBy("userID").count().show()
     train.show()
     test=movie_ratings.subtract(train)
-    test.groupBy("userID").count().show()
+    test.orderBy('userId').groupBy("userID").count().show()
     test.show()
 
 # Only enter this block if we're in main
