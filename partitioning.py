@@ -35,7 +35,8 @@ def main(spark):
     movie_ratings = spark.read.csv('hdfs:/user/sa6523/ratings.csv',header=True, schema='userId INT, movieId INT, ratings FLOAT, timestamp INT')
     movie_ratings.show()
     movie_ratings.groupBy("userID").count().show()
-    
+    train=movie_ratings.select("userId").distinct().sampleBy("userID", fractions={train: 0.7}, seed=10)
+    train.groupBy("userID").count().show()
    
 
 
