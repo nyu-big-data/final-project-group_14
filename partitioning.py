@@ -34,12 +34,12 @@ def main(spark):
     # Load the boats.txt and sailors.json data into DataFrame
     movie_ratings = spark.read.csv('hdfs:/user/sa6523/ratings.csv',header=True, schema='userId INT, movieId INT, ratings FLOAT, timestamp INT')
     movie_ratings.show()
-    movie_ratings.groupBy("userID").count().show()
-    train=movie_ratings.sampleBy("userID", fractions={i: 0.6 for i in range(1,611)}, seed=10)
-    train.groupBy("userID").count().show()
+    movie_ratings.groupBy("userId").count().show()
+    train=movie_ratings.sampleBy("userId", fractions={i: 0.6 for i in range(1,611)}, seed=10)
+    train.groupBy("userId").count().show()
     train.show()
     test=movie_ratings.subtract(train)
-    test.groupBy("userID").count().show()
+    test.groupBy("userId").count().show()
     test.orderBy('userId').show()
 
 # Only enter this block if we're in main
