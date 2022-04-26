@@ -10,4 +10,13 @@ def main(spark):
     w = Window.partitionBy('movieId')
     movie_ratings.withColumn("avg_rating", F.avg("rating").over(w)).orderBy("avg_rating").show()
 
+if __name__ == "__main__":
+    
+    # Create the spark session object
+    spark = SparkSession.builder.appName('part1').getOrCreate()
 
+    # Get user netID from the command line
+    netID = getpass.getuser()
+
+    # Call our main routine
+    main(spark)
