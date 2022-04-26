@@ -8,7 +8,7 @@ from pyspark.sql import SparkSession
 def main(spark):
     movie_ratings = spark.read.csv('hdfs:/user/sa6523/ratings.csv', header = True ,schema = 'userId INT, movieId INT, rating FLOAT, timestamp INT')
     w = Window.partitionBy('movieId')
-    movie_ratings.withColumn("avg_rating", F.avg("rating").over(w)).orderBy("avg_rating").show()
+    movie_ratings.withColumn("avg_rating", F.avg("rating").over(w)).orderBy("avg_rating").desc().show()
 
 if __name__ == "__main__":
     
