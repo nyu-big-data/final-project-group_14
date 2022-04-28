@@ -29,7 +29,7 @@ def main(spark):
 
     
 
-    movie_ratings = spark.read.csv('hdfs:/user/sr6172/ratings.csv', header = True ,schema = 'userId INT, movieId INT, rating FLOAT, timestamp INT')
+    movie_ratings = spark.read.csv('hdfs:/user/sr6172/ratings.csv', header = True ,schema = 'userId INT, movieId INT, rating FLOAT, timestamp DOUBLE')
     movie_ratings.show()
     
     movie_ratings.createOrReplaceTempView('movie_ratings')
