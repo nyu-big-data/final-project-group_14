@@ -44,12 +44,22 @@ def main(spark):
     test = spark.sql("SELECT * FROM movie_ratings WHERE userId in "+ str(test_users))
     val = spark.sql("SELECT * FROM movie_ratings WHERE userId in "+ str(val_users))
     
+    train.createOrReplaceTempView('train')
+    test.createOrReplaceTempView('test')
+    val.createOrReplaceTempView('val')
+    
     
     test_train = spark.sql("SELECT userId, PERCENTILE(timestamp, 0.6) as threshold FROM test GROUP BY userId ORDER BY timestamp")
     val_train = spark.sql("SELECT userId, PERCENTILE(timestamp, 0.6) as threshold FROM val GROUP BY userId ORDER BY timestamp")
     
+    test_train.createOrReplaceTempView('test_train')
+    val_train.createOrReplaceTempView('val_train')
+    
+    
     test_train = spark.sql("SELECT t.userId, t.movieId, t.rating, t.timestamp FROM test as t INNER JOIN test_train as tt ON t.userId = tt.userID WHERE timestamp <= threshold")
     val_train = spark.sql("SELECT v.userId, v.movieId, v.rating, v.timestamp FROM val as v INNER JOIN val_train as vt ON t.userId = vt.userID WHERE timestamp <= threshold")
+    
+    
     
     train = train.union(test_train)
     train = train.union(val_train)
