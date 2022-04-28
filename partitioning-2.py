@@ -37,8 +37,8 @@ def main(spark):
     partition = movie_ratings.select('userId').distinct().randomSplit([0.4, 0.3, 0.3], seed = 1234)
     
     train_users = tuple(list(x.userId for x in partition[0].collect()))
-    val_users = list(x.userId for x in partition[1].collect())
-    test_users = list(x.userId for x in partition[2].collect())
+    val_users = tuple(list(x.userId for x in partition[1].collect()))
+    test_users = tuple(list(x.userId for x in partition[2].collect()))
     
     train = spark.sql("SELECT * FROM movie_ratings WHERE userId in "+ str(train_users))
     test = spark.sql("SELECT * FROM movie_ratings WHERE userId in "+ str(test_users))
