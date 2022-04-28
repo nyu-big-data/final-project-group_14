@@ -57,7 +57,7 @@ def main(spark):
     
     
     test_train = spark.sql("SELECT t.userId, t.movieId, t.rating, t.timestamp FROM test as t INNER JOIN test_train as tt ON t.userId = tt.userID WHERE t.timestamp <= tt.threshold")
-    val_train = spark.sql("SELECT v.userId, v.movieId, v.rating, v.timestamp FROM val as v INNER JOIN val_train as vt ON t.userId = vt.userID WHERE v.timestamp <= vt.threshold")
+    val_train = spark.sql("SELECT v.userId, v.movieId, v.rating, v.timestamp FROM val as v INNER JOIN val_train as vt ON v.userId = vt.userID WHERE v.timestamp <= vt.threshold")
     
     
     
