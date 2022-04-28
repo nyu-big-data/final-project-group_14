@@ -18,7 +18,7 @@ import getpass
 from pyspark.sql import SparkSession
 
 
-def main(spark):
+def partition(spark, file_path):
     '''Main routine for Lab Solutions
     Parameters
     ----------
@@ -29,7 +29,7 @@ def main(spark):
 
     
 
-    movie_ratings = spark.read.csv('hdfs:/user/sr6172/ratings.csv', header = True ,schema = 'userId INT, movieId INT, rating FLOAT, timestamp DOUBLE')
+    movie_ratings = spark.read.csv(file_path+'/ratings.csv', header = True ,schema = 'userId INT, movieId INT, rating FLOAT, timestamp DOUBLE')
     movie_ratings.show()
     
     movie_ratings.createOrReplaceTempView('movie_ratings')
@@ -73,7 +73,10 @@ def main(spark):
     
     
     
-    
+    train.write.csv(file_path+'/ratings_train_splits.csv', header=True)
+    val.write.csv(file_path+'/ratings_valid_splits.csv', header=True)
+    test.write.csv(file_path+'/ratings_test_splits.csv', header=True)
+
     
     
     
@@ -136,13 +139,13 @@ def main(spark):
 # Only enter this block if we're in main
 if __name__ == "__main__":
 
-    # Create the spark session object
-    spark = SparkSession.builder.appName('part1').getOrCreate()
+    # Create Spark session object
+    spark = SparkSession.builder.appName('data_partition').getOrCreate()
 
-    # Get user netID from the command line
-    netID = getpass.getuser()
+    # Get file path for the dataset to split
+    file_path = sys.argv[1]
 
-    # Call our main routine
-    main(spark)
+    # Calling the split function
+    partition(spark, file_path)
     
     
