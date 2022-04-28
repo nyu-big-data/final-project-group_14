@@ -67,9 +67,9 @@ def main(spark):
     test = test.subtract(test_train)
     val = val.subtract(val_train)
     
-    train.show()
-    test.show()
-    val.show()
+    train.orderBy('userId').show()
+    test.orderBy('userId').show()
+    val.orderBy('userId').show()
     
     
     
