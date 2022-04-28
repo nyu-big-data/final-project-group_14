@@ -30,8 +30,8 @@ def partition(spark, file_path):
 
     
 
-    #movie_ratings = spark.read.csv(file_path+'/ratings.csv', header = True ,schema = 'userId INT, movieId INT, rating FLOAT, timestamp DOUBLE')
-    movie_ratings = spark.read.parquet(file_path+'/ratings.parquet')
+    movie_ratings = spark.read.csv(file_path+'/ratings.csv', header = True ,schema = 'userId INT, movieId INT, rating FLOAT, timestamp DOUBLE')
+    #movie_ratings = spark.read.parquet(file_path+'/ratings.parquet')
     movie_ratings.show()
     
     movie_ratings.createOrReplaceTempView('movie_ratings')
@@ -75,13 +75,13 @@ def partition(spark, file_path):
     
     
     
-    #train.write.csv(file_path+'/ratings_train_splits.csv', header=True)
-    #val.write.csv(file_path+'/ratings_valid_splits.csv', header=True)
-    #test.write.csv(file_path+'/ratings_test_splits.csv', header=True)
+    train.write.csv(file_path+'/ratings_train_splits.csv', header=True)
+    val.write.csv(file_path+'/ratings_valid_splits.csv', header=True)
+    test.write.csv(file_path+'/ratings_test_splits.csv', header=True)
     
-    train.write.parquet(file_path+'/ratings_train_splits.parquet')
-    val.write.parquet(file_path+'/ratings_valid_splits.parquet')
-    test.write.parquet(file_path+'/ratings_test_splits.parquet')
+    #train.write.parquet(file_path+'/ratings_train_splits.parquet')
+    #val.write.parquet(file_path+'/ratings_valid_splits.parquet')
+    #test.write.parquet(file_path+'/ratings_test_splits.parquet')
     
     
 
