@@ -16,6 +16,7 @@ import getpass
 #from pyspark.sql import Row
 # And pyspark.sql to get the spark session
 from pyspark.sql import SparkSession
+import sys
 
 
 def partition(spark, file_path):
