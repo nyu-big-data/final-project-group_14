@@ -10,10 +10,10 @@ Created on Sun Apr 24 15:25:28 2022
 
 #Use getpass to obtain user netID
 import getpass
-import math
-from pyspark.sql import functions as F
-from pyspark.sql.window import Window
-from pyspark.sql import Row
+#import math
+#from pyspark.sql import functions as F
+#from pyspark.sql.window import Window
+#from pyspark.sql import Row
 # And pyspark.sql to get the spark session
 from pyspark.sql import SparkSession
 
@@ -27,30 +27,98 @@ def main(spark):
     '''
 
 
-    # Load the boats.txt and sailors.json data into DataFrame
+    
 
     movie_ratings = spark.read.csv('hdfs:/user/sr6172/ratings.csv', header = True ,schema = 'userId INT, movieId INT, rating FLOAT, timestamp INT')
     movie_ratings.show()
     
-    movie_ratings.groupBy("userId").count().show()
-    train=movie_ratings.sampleBy("userId", fractions={i: 0.6 for i in range(1,611)}, seed=1234)
+    movie_ratings.createOrReplaceTempView('movie_ratings')
     
-    train.groupBy("userId").count().show()
+    partition = movie_ratings.select('userId').distinct().randomSplit([0.4, 0.3, 0.3], seed = 1234)
+    
+    train_users = tuple(list(x.userId for x in partition[0].collect()))
+    val_users = list(x.userId for x in partition[1].collect())
+    test_users = list(x.userId for x in partition[2].collect())
+    
+    train = spark.sql("SELECT * FROM movie_ratings WHERE userId in "+ str(train_users))
+    test = spark.sql("SELECT * FROM movie_ratings WHERE userId in "+ str(test_users))
+    val = spark.sql("SELECT * FROM movie_ratings WHERE userId in "+ str(val_users))
+    
+    
+    test_train = spark.sql("SELECT userId, PERCENTILE(timestamp, 0.6) as threshold FROM test GROUP BY userId ORDER BY timestamp")
+    val_train = spark.sql("SELECT userId, PERCENTILE(timestamp, 0.6) as threshold FROM val GROUP BY userId ORDER BY timestamp")
+    
+    test_train = spark.sql("SELECT t.userId, t.movieId, t.rating, t.timestamp FROM test as t INNER JOIN test_train as tt ON t.userId = tt.userID WHERE timestamp <= threshold")
+    val_train = spark.sql("SELECT v.userId, v.movieId, v.rating, v.timestamp FROM val as v INNER JOIN val_train as vt ON t.userId = vt.userID WHERE timestamp <= threshold")
+    
+    train = train.union(test_train)
+    train = train.union(val_train)
+    
+    test = test.subtract(test_train)
+    val = val.subtract(val_train)
+    
     train.show()
+    test.show()
+    val.show()
     
-    test=movie_ratings.subtract(train)
-    test.groupBy("userId").count().show()
     
-    test.orderBy('userId').show()
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    #movies = spark.read.csv('hdfs:/user/sr6172/movies.csv', header = True, schema = 'movieId INT, title STRING, genres STRING')
+    #movie_ratings = movie_ratings.join(movies, on='movieId', how='inner')
+    
+    #movie_ratings.groupBy("userId").count().show()
+    #train=movie_ratings.sampleBy("userId", fractions={ }, seed=1234)
+    #train.groupBy("userId").count().show()
+    #train.show()
+    
+    #test=movie_ratings.subtract(train)
+    #test.groupBy("userId").count().show()
+    
+    #test.orderBy('userId').show()
     
     #window = Window.partitionBy('userId').orderBy('')
     #test = test.select('userId','movieId','rating','timestamp', F.row_number().over(window).alias("row_number"))
     
-    test_split = test.filter(test.userId % 2 == 1)
-    val_split = test.filter(test.userId % 2 == 0)
+    #test_split = test.filter(test.userId % 2 == 1)
+    #val_split = test.filter(test.userId % 2 == 0)
     
-    test_split.show()
-    val_split.show()
+    #test_split.show()
+    #val_split.show()
+    
+    
+    
 
     
 
