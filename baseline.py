@@ -1,6 +1,6 @@
 import getpass
 import math
-import pyspark.sparkContext as sc
+import pyspark
 from pyspark.sql import functions as F
 from pyspark.sql.window import Window
 from pyspark.sql import Row
@@ -38,7 +38,7 @@ def main(spark, file_path):
         
         eval_list.append((top_100, row.movieIds))
         
-    predictionAndLabels = sc.parallelize(eval_list)
+    predictionAndLabels = pyspark.SparkContext.parallelize(eval_list)
     metrics = RankingMetrics(predictionAndLabels)
     print(metrics.meanAveragePrecisionAt(100))
     print(metrics.meanAveragePrecision)
