@@ -13,9 +13,14 @@ import numpy
 
 def main(spark, file_path):
     
-    train_ratings = spark.read.csv(file_path+'/ratings_train_splits.csv', header = True ,schema = 'userId INT, movieId INT, rating FLOAT, timestamp INT')
-    val_ratings = spark.read.csv(file_path+'/ratings_valid_splits.csv', header = True ,schema = 'userId INT, movieId INT, rating FLOAT, timestamp INT')
-    test_ratings = spark.read.csv(file_path+'/ratings_test_splits.csv', header = True ,schema = 'userId INT, movieId INT, rating FLOAT, timestamp INT')
+    #train_ratings = spark.read.csv(file_path+'/ratings_train_splits.csv', header = True ,schema = 'userId INT, movieId INT, rating FLOAT, timestamp INT')
+    #val_ratings = spark.read.csv(file_path+'/ratings_valid_splits.csv', header = True ,schema = 'userId INT, movieId INT, rating FLOAT, timestamp INT')
+    #test_ratings = spark.read.csv(file_path+'/ratings_test_splits.csv', header = True ,schema = 'userId INT, movieId INT, rating FLOAT, timestamp INT')
+    
+    train_ratings = spark.read.parquet(file_path+'/ratings_train_splits.parquet')
+    val_ratings = spark.read.parquet(file_path+'/ratings_valid_splits.parquet')
+    test_ratings = spark.read.parquet(file_path+'/ratings_test_splits.parquet')
+    
     
     train_ratings.createOrReplaceTempView('train_ratings')
     val_ratings.createOrReplaceTempView('val_ratings')
@@ -59,9 +64,10 @@ def main(spark, file_path):
 
     predictionAndLabels = sc.parallelize(eval_list2)
     metrics2 = RankingMetrics(predictionAndLabels)
+    
     print(metrics2.meanAveragePrecisionAt(100))
     print(metrics2.meanAveragePrecision)
-    print(metrics.precisionAt(100))
+    print(metrics2.precisionAt(100))
     
     
     
