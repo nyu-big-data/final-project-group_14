@@ -27,9 +27,15 @@ def main(spark, file_path):
     
     
     
-    val_ratings.groupBy("userId").agg(F.collect_list("movieId").alias("movieIds")).show()
-    
+    val_ratings = val_ratings.groupBy("userId").agg(F.collect_list("movieId").alias("movieIds")).show()
     top_100 = top_100.select('movieId').rdd.flatMap(lambda x: x).collect()
+    
+    eval_list = []
+    for row in val_ratings.select("movieIds").rdd.collect():
+        eval_list.append((top_100, row))
+        
+    print(eval_list)
+    
     
     
     
