@@ -38,12 +38,12 @@ def main(spark, file_path):
         
         eval_list.append((top_100, row.movieIds))
         
-    #predictionAndLabels = sc.parallelize(eval_list)
-    #metrics = RankingMetrics(predictionAndLabels)
-    #print(metrics.meanAveragePrecisionAt(100))
-    #print(metrics.meanAveragePrecision)
+    predictionAndLabels = sc.parallelize(eval_list)
+    metrics = RankingMetrics(predictionAndLabels)
+    print(metrics.meanAveragePrecisionAt(100))
+    print(metrics.meanAveragePrecision)
     
-    print(eval_list)
+    
     
     
     
