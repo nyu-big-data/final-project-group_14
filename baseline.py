@@ -5,6 +5,8 @@ from pyspark.sql.window import Window
 from pyspark.sql import Row
 # And pyspark.sql to get the spark session
 from pyspark.sql import SparkSession
+import sys 
+
 def main(spark, file_path):
     
     train_ratings = spark.read.csv(file_path+'/ratings_train_splits.csv', header = True ,schema = 'userId INT, movieId INT, rating FLOAT, timestamp INT')
@@ -44,7 +46,6 @@ if __name__ == "__main__":
     spark = SparkSession.builder.appName('part1').getOrCreate()
 
     # Get user netID from the command line
-    netID = getpass.getuser()
-
+    file_path = sys.argv[1]
     # Call our main routine
-    main(spark)
+    main(spark, file_path)
