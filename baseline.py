@@ -47,7 +47,21 @@ def main(spark, file_path):
     metrics = RankingMetrics(predictionAndLabels)
     print(metrics.meanAveragePrecisionAt(100))
     print(metrics.meanAveragePrecision)
+    print(metrics.precisionAt(100))
     
+    
+    test_ratings = test_ratings.groupBy("userId").agg(F.collect_list("movieId").alias("movieIds"))
+    
+    eval_list2 = []
+    for row in test_ratings.rdd.collect():
+        
+        eval_list2.append((top_100, row.movieIds))
+
+    predictionAndLabels = sc.parallelize(eval_list2)
+    metrics2 = RankingMetrics(predictionAndLabels)
+    print(metrics2.meanAveragePrecisionAt(100))
+    print(metrics2.meanAveragePrecision)
+    print(metrics.precisionAt(100))
     
     
     
