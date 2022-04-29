@@ -31,8 +31,9 @@ def main(spark, file_path):
     top_100 = top_100.select('movieId').rdd.flatMap(lambda x: x).collect()
     
     eval_list = []
-    for row in val_ratings.select("movieIds").rdd.collect():
-        eval_list.append((top_100, row))
+    for row in val_ratings.rdd.collect():
+        
+        eval_list.append((top_100, row.movieIds))
         
     print(eval_list)
     
