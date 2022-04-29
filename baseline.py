@@ -8,6 +8,7 @@ from pyspark.sql import SparkSession
 from pyspark.mllib.evaluation import RankingMetrics
 import sys 
 from pyspark.sql import SQLContext as sc
+import numpy
 
 def main(spark, file_path):
     
