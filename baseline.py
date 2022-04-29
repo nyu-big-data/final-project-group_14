@@ -40,8 +40,8 @@ def main(spark, file_path):
         eval_list.append((top_100, row.movieIds))
 
     
-    conf = SparkConf().setMaster("local").setAppName("My App")
-    sc = SparkContext(conf = conf)
+    
+    sc = SparkContext()
         
     predictionAndLabels = sc.parallelize(eval_list)
     metrics = RankingMetrics(predictionAndLabels)
