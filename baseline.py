@@ -41,7 +41,7 @@ def main(spark, file_path):
 
     
     
-    sc = SparkContext()
+    sc =  SparkContext.getOrCreate()
         
     predictionAndLabels = sc.parallelize(eval_list)
     metrics = RankingMetrics(predictionAndLabels)
