@@ -10,7 +10,7 @@ import sys
 def main(spark, file_path):
     
     train_ratings = spark.read.csv(file_path+'/ratings_train_splits.csv', header = True ,schema = 'userId INT, movieId INT, rating FLOAT, timestamp INT')
-    val_ratings = spark.read.csv(file_path+'/ratings_val_splits.csv', header = True ,schema = 'userId INT, movieId INT, rating FLOAT, timestamp INT')
+    val_ratings = spark.read.csv(file_path+'/ratings_valid_splits.csv', header = True ,schema = 'userId INT, movieId INT, rating FLOAT, timestamp INT')
     test_ratings = spark.read.csv(file_path+'/ratings_test_splits.csv', header = True ,schema = 'userId INT, movieId INT, rating FLOAT, timestamp INT')
     
     train_ratings.createOrReplaceTempView('train_ratings')
