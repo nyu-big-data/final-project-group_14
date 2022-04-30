@@ -54,10 +54,10 @@ def main(spark, file_path):
     movies = ratings.select(als.getItemCol()).distinct().limit(3)
     movieSubSetRecs = model.recommendForItemSubset(movies, 10)
     
-    print(userRecs)
-    print(movieRecs)
-    print(userSubsetRecs)
-    print(movieSubSetRecs)
+    userRecs.show()
+    movieRecs.show()
+    userSubsetRecs.show()
+    movieSubSetRecs.show()
     
     
 
