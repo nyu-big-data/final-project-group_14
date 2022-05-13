@@ -22,30 +22,33 @@ def main(spark, file_path):
     
     #Reading train, val and test CSVs or Parquet files.
     
-    #train_ratings = spark.read.csv(file_path+'/ratings_train_splits.csv', header = True ,schema = 'userId INT, movieId INT, rating FLOAT, timestamp INT')
-    #val_ratings = spark.read.csv(file_path+'/ratings_valid_splits.csv', header = True ,schema = 'userId INT, movieId INT, rating FLOAT, timestamp INT')
-    #test_ratings = spark.read.csv(file_path+'/ratings_test_splits.csv', header = True ,schema = 'userId INT, movieId INT, rating FLOAT, timestamp INT')
-    #ratings = spark.read.csv(file_path+'/ratings.csv', header = True ,schema = 'userId INT, movieId INT, rating FLOAT, timestamp INT')
+    train_ratings = spark.read.csv(file_path+'/ratings_train_splits.csv', header = True ,schema = 'userId INT, movieId INT, rating FLOAT, timestamp INT')
+    val_ratings = spark.read.csv(file_path+'/ratings_valid_splits.csv', header = True ,schema = 'userId INT, movieId INT, rating FLOAT, timestamp INT')
+    test_ratings = spark.read.csv(file_path+'/ratings_test_splits.csv', header = True ,schema = 'userId INT, movieId INT, rating FLOAT, timestamp INT')
+    ratings = spark.read.csv(file_path+'/ratings.csv', header = True ,schema = 'userId INT, movieId INT, rating FLOAT, timestamp INT')
     
-    train_ratings = spark.read.parquet(file_path+'/ratings_train_splits.parquet')
-    val_ratings = spark.read.parquet(file_path+'/ratings_valid_splits.parquet')
-    test_ratings = spark.read.parquet(file_path+'/ratings_test_splits.parquet')
-    ratings = spark.read.parquet(file_path+'/ratings.parquet')
+    #train_ratings = spark.read.parquet(file_path+'/ratings_train_splits.parquet')
+    #val_ratings = spark.read.parquet(file_path+'/ratings_valid_splits.parquet')
+    #test_ratings = spark.read.parquet(file_path+'/ratings_test_splits.parquet')
+    #ratings = spark.read.parquet(file_path+'/ratings.parquet')
     
     train_ratings.createOrReplaceTempView('train_ratings')
     val_ratings.createOrReplaceTempView('val_ratings')
     test_ratings.createOrReplaceTempView('test_ratings')
     
-    als = ALS(maxIter=5, regParam=0.01, userCol="userId", itemCol="movieId", ratingCol="rating",
-          coldStartStrategy="drop")
-    model = als.fit(train_ratings)
+    
 
     # Evaluate the model by computing the RMSE on the test data
-    predictions = model.transform(val_ratings)
-    evaluator = RegressionEvaluator(metricName="rmse", labelCol="rating",
+    hyper_param_maxIter = [5,10,20,25,30]
+    for i in hyper_param_maxIter:
+        als = ALS(maxIter=i, regParam=0.01, userCol="userId", itemCol="movieId", ratingCol="rating",
+          coldStartStrategy="drop")
+        model = als.fit(train_ratings)
+        predictions = model.transform(val_ratings)
+        evaluator = RegressionEvaluator(metricName="rmse", labelCol="rating",
                                 predictionCol="prediction")
-    rmse = evaluator.evaluate(predictions)
-    print("Root-mean-square error = " + str(rmse))
+        rmse = evaluator.evaluate(predictions)
+        print("Root-mean-square error = " + str(rmse))
 
     # Generate top 10 movie recommendations for each user
     userRecs = model.recommendForAllUsers(10)
