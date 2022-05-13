@@ -39,7 +39,7 @@ def main(spark, file_path):
     
 
     # Evaluate the model by computing the RMSE on the test data
-    hyper_param_maxIter = [5,10,20,25,30]
+    hyper_param_maxIter = [25,30]
     for i in hyper_param_maxIter:
         als = ALS(maxIter=i, regParam=0.01, userCol="userId", itemCol="movieId", ratingCol="rating",
           coldStartStrategy="drop")
