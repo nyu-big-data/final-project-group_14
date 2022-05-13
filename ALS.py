@@ -39,16 +39,25 @@ def main(spark, file_path):
     
 
     # Evaluate the model by computing the RMSE on the test data
-    hyper_param_maxIter = [25,30]
-    for i in hyper_param_maxIter:
-        als = ALS(maxIter=i, regParam=0.01, userCol="userId", itemCol="movieId", ratingCol="rating",
-          coldStartStrategy="drop")
-        model = als.fit(train_ratings)
-        predictions = model.transform(val_ratings)
-        evaluator = RegressionEvaluator(metricName="rmse", labelCol="rating",
-                                predictionCol="prediction")
-        rmse = evaluator.evaluate(predictions)
-        print("Root-mean-square error = " + str(rmse))
+    
+    hyper_param_reg = [0.001]#,0.01,0.1,1]
+    hyper_param_rank = [10]#,20,40,100,200,400]
+    for i in hyper_param_reg:
+        for j in hyper_param_rank:
+            
+            als = ALS(maxIter=25, regParam= i, userCol="userId", itemCol="movieId", ratingCol="rating",
+              coldStartStrategy="drop", rank = j)
+            model = als.fit(train_ratings)
+            predictions = model.transform(val_ratings)
+            evaluator = RegressionEvaluator(metricName="rmse", labelCol="rating",
+                                    predictionCol="prediction")
+            rmse = evaluator.evaluate(predictions)
+            print("Root-mean-square error = " + str(rmse))
+           
+            metrics = RankingMetrics(predictions)
+            print(metrics.meanAveragePrecisionAt(100))
+            print(metrics.meanAveragePrecision)
+            print(metrics.precisionAt(100))
 
     # Generate top 10 movie recommendations for each user
     userRecs = model.recommendForAllUsers(10)
