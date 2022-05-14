@@ -9,7 +9,8 @@ Created on Fri Apr 29 20:38:20 2022
 from pyspark.ml.evaluation import RegressionEvaluator
 from pyspark.ml.recommendation import ALS
 from pyspark.sql import Row
-
+from pyspark.sql.types import *
+from pyspark.sql.functions import udf, col
 from pyspark.sql import functions as F
 from pyspark.sql.window import Window
 from pyspark import SparkContext
@@ -36,28 +37,34 @@ def main(spark, file_path):
     val_ratings.createOrReplaceTempView('val_ratings')
     test_ratings.createOrReplaceTempView('test_ratings')
     
-    
+    val_users = val_ratings.select('userId').distinct()
+    val_rating_original = val_ratings.groupBy('userId').agg(F.collect_set('movieId').alias('movie_recs'))
 
-    # Evaluate the model by computing the RMSE on the test data
+    # Evaluate the model 
     
-    hyper_param_reg = [0.001]#,0.01,0.1,1]
-    hyper_param_rank = [10]#,20,40,100,200,400]
+    hyper_param_reg = [0.001] #,0.01,0.1,1]
+    hyper_param_rank = [10] #,20,40,100,200,400]
+    
     for i in hyper_param_reg:
         for j in hyper_param_rank:
             
             als = ALS(maxIter=25, regParam= i, userCol="userId", itemCol="movieId", ratingCol="rating",
               coldStartStrategy="drop", rank = j)
             model = als.fit(train_ratings)
-            predictions = model.transform(val_ratings)
-            evaluator = RegressionEvaluator(metricName="rmse", labelCol="rating",
-                                    predictionCol="prediction")
-            rmse = evaluator.evaluate(predictions)
-            print("Root-mean-square error = " + str(rmse))
-           
-            metrics = RankingMetrics(predictions)
-            print(metrics.meanAveragePrecisionAt(100))
-            print(metrics.meanAveragePrecision)
-            print(metrics.precisionAt(100))
+            predictions = model.recommenedForUserSubset(val_users, 100)
+            predictions_udf = udf(lambda l : [i[0] for i in l], ArrayType(IntegerType()))
+        
+            predictions = predictions.select("userId", predictions_udf(col("recommendations")).alias('recommendations'))
+            prediction_and_labels = predictions.join(val_rating_original, on='userId', how='inner').drop('userId').rdd
+
+            metrics = RankingMetrics(prediction_and_labels)
+            PK = metrics.precisionAt(100)
+            MAP = metrics.meanAveragePrecision
+            NDCG = metrics.ndcgAt(100)
+            
+            print(PK)
+            print(MAP)
+            print(NDCG)
 
     # Generate top 10 movie recommendations for each user
     userRecs = model.recommendForAllUsers(10)
