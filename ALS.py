@@ -10,6 +10,7 @@ from pyspark.ml.evaluation import RegressionEvaluator
 from pyspark.ml.recommendation import ALS
 from pyspark.sql import Row
 from pyspark.sql.types import *
+from pyspark.sql.functions import explode
 from pyspark.sql.functions import udf, col
 from pyspark.sql import functions as F
 from pyspark.sql.window import Window
@@ -60,13 +61,13 @@ def main(spark, file_path):
             #groundtruth = val_ratings.groupby("userId").agg(F.collect_set("movieId").alias('groundtruth'))
             #groundtruth.createOrReplaceTempView("groundtruth")
             
-            predictions = predictions.withColumn("movie_recs",col("recommendations.movieId"))
-            predictions.createOrReplaceTempView("predictions")
+            #predictions = predictions.withColumn("movie_recs",col("recommendations.movieId"))
+            #predictions.createOrReplaceTempView("predictions")
             
-            predictions = predictions.drop('recommendations')
+            #predictions = predictions.drop('recommendations')
             
-            predictions.createOrReplaceTempView("predictions")
-            
+            #predictions.createOrReplaceTempView("predictions")
+            predictions.withColumn("recommendations", explode("recommendations"))
             predictions.show()
              
             #total = spark.sql("SELECT g.userId, g.groundtruth AS groundtruth, p.movie_recs AS predictions FROM groundtruth g JOIN predictions p ON g.userId = p.userId")
