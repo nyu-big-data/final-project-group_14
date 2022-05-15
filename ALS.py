@@ -44,7 +44,7 @@ def main(spark, file_path):
     # Evaluate the model 
     
     hyper_param_reg = [0.001]#,0.01,0.1,1]
-    hyper_param_rank = [20]#,20,40,100,200,400]
+    hyper_param_rank = [100]#,20,100,200,400]
     for i in hyper_param_reg:
         for j in hyper_param_rank:
             
