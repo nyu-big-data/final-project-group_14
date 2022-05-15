@@ -75,7 +75,7 @@ def main(spark, file_path):
             
             val_pred.createOrReplaceTempView('val_pred')
             
-            movieRecs.show()
+            val_pred.show()
             
             
 
