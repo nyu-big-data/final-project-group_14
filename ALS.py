@@ -38,7 +38,7 @@ def main(spark, file_path):
     test_ratings.createOrReplaceTempView('test_ratings')
     
     val_users = val_ratings.select('userId').distinct()
-    val_rating_original = val_ratings.groupBy('userId').agg(F.collect_set('movieId').alias('movie_recs'))
+
 
     # Evaluate the model 
     
@@ -55,33 +55,53 @@ def main(spark, file_path):
             predictions_udf = udf(lambda l : [i[0] for i in l], ArrayType(IntegerType()))
         
             predictions = predictions.select("userId", predictions_udf(col("recommendations")).alias('recommendations'))
-            prediction_and_labels = predictions.join(val_rating_original, on='userId', how='inner').drop('userId').rdd
-
-            metrics = RankingMetrics(prediction_and_labels)
-            PK = metrics.precisionAt(100)
-            MAP = metrics.meanAveragePrecision
-            NDCG = metrics.ndcgAt(100)
             
-            print(PK)
-            print(MAP)
-            print(NDCG)
+            #metrics = RankingMetrics(prediction_and_labels)
+            #PK = metrics.precisionAt(100)
+            #MAP = metrics.meanAveragePrecision
+            #NDCG = metrics.ndcgAt(100)
+            
+            #print(PK)
+            #print(MAP)
+            #print(NDCG)
+            
+            val_ratings = val_ratings.groupBy("userId").agg(F.collect_list("movieId").alias("movieIds"))
+            
+            val_pred = predictions.join(val_ratings, on='userId', how='inner').drop('userId')
+
+          
+    
+    
+            eval_list = []
+            for row in val_pred.rdd.collect():
+        
+                eval_list.append((row.recommendations, row.movieIds))
+            sc =  SparkContext.getOrCreate()
+     
+            #Evaluation on val
+            predictionAndLabels = sc.parallelize(eval_list)
+            metrics = RankingMetrics(predictionAndLabels)
+            
+            print(metrics.PrecisionAt(100))
+            print(metrics.meanAveragePrecision)
+            print(metrics.ndcgAt(100))
 
     # Generate top 10 movie recommendations for each user
-    userRecs = model.recommendForAllUsers(10)
+    #userRecs = model.recommendForAllUsers(10)
     # Generate top 10 user recommendations for each movie
-    movieRecs = model.recommendForAllItems(10)
+    #movieRecs = model.recommendForAllItems(10)
 
     # Generate top 10 movie recommendations for a specified set of users
-    users = ratings.select(als.getUserCol()).distinct().limit(3)
-    userSubsetRecs = model.recommendForUserSubset(users, 10)
+    #users = ratings.select(als.getUserCol()).distinct().limit(3)
+    #userSubsetRecs = model.recommendForUserSubset(users, 10)
     # Generate top 10 user recommendations for a specified set of movies
-    movies = ratings.select(als.getItemCol()).distinct().limit(3)
-    movieSubSetRecs = model.recommendForItemSubset(movies, 10)
+    #movies = ratings.select(als.getItemCol()).distinct().limit(3)
+    #movieSubSetRecs = model.recommendForItemSubset(movies, 10)
     
-    userRecs.show()
-    movieRecs.show()
-    userSubsetRecs.show()
-    movieSubSetRecs.show()
+    #userRecs.show()
+    #movieRecs.show()
+    #userSubsetRecs.show()
+    #movieSubSetRecs.show()
     
     
 
