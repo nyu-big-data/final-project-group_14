@@ -30,9 +30,9 @@ def main(spark):
 
     '''
     
-    movie_ratings = spark.read.csv('hdfs:/user/sr6172/ml-latest/ratings.csv', header = True ,schema = 'userId INT, movieId INT, rating FLOAT, timestamp DOUBLE')
-    movie_ratings.createOrReplaceTempView('movie_ratings')
-    movie_ratings.write.parquet("hdfs:/user/sr6172/ml-latest/ratings.parquet") 
+    movie_ratings = spark.read.csv('hdfs:/user/sa6523/ml-latest/ratings.csv', header = True ,schema = 'userId INT, movieId INT, rating FLOAT, timestamp DOUBLE')
+    #movie_ratings.createOrReplaceTempView('movie_ratings')
+    movie_ratings.write.parquet("hdfs:/user/sa6523/ml-latest/ratings.parquet") 
 
    
     
