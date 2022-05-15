@@ -114,19 +114,19 @@ def main(spark, file_path):
             
     
     
-            #eval_list = []
-            #for row in val_pred.collect():
+            eval_list = []
+            for row in total.rdd.collect():
         
-               # eval_list.append((row.recommendations, row.movieIds))
-            #sc =  SparkContext.getOrCreate()
+               eval_list.append((row.predictions, row.groundtruth))
+            sc =  SparkContext.getOrCreate()
      
             #Evaluation on val
-            #predictionAndLabels = sc.parallelize(eval_list)
-            #metrics = RankingMetrics(predictionAndLabels)
+            predictionAndLabels = sc.parallelize(eval_list)
+            metrics = RankingMetrics(predictionAndLabels)
             
-            #print(metrics.precisionAt(100))
-            #print(metrics.meanAveragePrecision)
-            #print(metrics.ndcgAt(100))
+            print(metrics.precisionAt(100))
+            print(metrics.meanAveragePrecision)
+            print(metrics.ndcgAt(100))
 
     
     # Generate top 10 movie recommendations for each user
