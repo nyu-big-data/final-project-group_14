@@ -44,7 +44,6 @@ def main(spark, file_path):
     
     hyper_param_reg = [0.001] #,0.01,0.1,1]
     hyper_param_rank = [10] #,20,40,100,200,400]
-    
     for i in hyper_param_reg:
         for j in hyper_param_rank:
             
@@ -55,8 +54,8 @@ def main(spark, file_path):
             predictions.createOrReplaceTempView('predictions')
             
             
-            predictions_udf = udf(lambda l : [i[0] for i in l], ArrayType(IntegerType()))
-            predictions = predictions.select("userId", predictions_udf(col("recommendations")).alias('recommendations'))
+            #predictions_udf = udf(lambda l : [i[0] for i in l], ArrayType(IntegerType()))
+            #predictions = predictions.select("userId", predictions_udf(col("recommendations")).alias('recommendations'))
             
             predictions.show()
             #metrics = RankingMetrics(prediction_and_labels)
@@ -92,6 +91,7 @@ def main(spark, file_path):
             #print(metrics.meanAveragePrecision)
             #print(metrics.ndcgAt(100))
 
+    
     # Generate top 10 movie recommendations for each user
     #userRecs = model.recommendForAllUsers(10)
     # Generate top 10 user recommendations for each movie
