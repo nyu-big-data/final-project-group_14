@@ -52,10 +52,11 @@ def main(spark, file_path):
               coldStartStrategy="drop", rank = j)
             model = als.fit(train_ratings)
             predictions = model.recommendForUserSubset(val_users, 100)
+            predictions.createOrReplaceTempView('predictions')
             
-            #predictions_udf = udf(lambda l : [i[0] for i in l], ArrayType(IntegerType()))
-        
-            #predictions = predictions.select("userId", predictions_udf(col("recommendations")).alias('recommendations'))
+            
+            predictions_udf = udf(lambda l : [i[0] for i in l], ArrayType(IntegerType()))
+            predictions = predictions.select("userId", predictions_udf(col("recommendations")).alias('recommendations'))
             
             #metrics = RankingMetrics(prediction_and_labels)
             #PK = metrics.precisionAt(100)
@@ -66,10 +67,17 @@ def main(spark, file_path):
             #print(MAP)
             #print(NDCG)
             
-            print(predictions)
-            #val_ratings = val_ratings.groupBy("userId").agg(F.collect_list("movieId").alias("movieIds"))
             
-            #val_pred = predictions.join(val_ratings, on='userId', how='inner').drop('userId')
+            val_ratings = val_ratings.groupBy("userId").agg(F.collect_list("movieId").alias("movieIds"))
+            val_ratings.createOrReplaceTempView('val_ratngs')
+            
+            val_pred = predictions.join(val_ratings, on='userId', how='inner').drop('userId')
+            
+            val_pred.createOrReplaceTempView('val_pred')
+            
+            movieRecs.show()
+            
+            
 
           
     
