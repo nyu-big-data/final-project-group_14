@@ -71,7 +71,12 @@ def main(spark, file_path):
             #predictions.where(col("recommendations").getItem("movieID")).show()
             #predictions_1=predictions.toPandas()
             predictions.show()
-             
+            
+            groundtruth = val_ratings.groupby("user_id").agg(F.collect_set("movieId").alias('groundtruth'))
+            groundtruth.createOrReplaceTempView("groundtruth")
+            total = spark.sql("SELECT g.user_id, g.groundtruth AS groundtruth, p.movie_recs AS predictions FROM groundtruth g JOIN predictions p ON g.user_id = p.user_id")
+            total.createOrReplaceTempView("total")
+            total.show()
             #total = spark.sql("SELECT g.userId, g.groundtruth AS groundtruth, p.movie_recs AS predictions FROM groundtruth g JOIN predictions p ON g.userId = p.userId")
             #total.createOrReplaceTempView("total")
             
