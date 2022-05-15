@@ -51,7 +51,7 @@ def main(spark, file_path):
             als = ALS(maxIter=25, regParam= i, userCol="userId", itemCol="movieId", ratingCol="rating",
               coldStartStrategy="drop", rank = j)
             model = als.fit(train_ratings)
-            predictions = model.recommenedForUserSubset(val_users, 100)
+            predictions = model.recommendForUserSubset(val_users, 100)
             predictions_udf = udf(lambda l : [i[0] for i in l], ArrayType(IntegerType()))
         
             predictions = predictions.select("userId", predictions_udf(col("recommendations")).alias('recommendations'))
