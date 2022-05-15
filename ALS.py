@@ -50,33 +50,43 @@ def main(spark, file_path):
             als = ALS(maxIter=25, regParam= i, userCol="userId", itemCol="movieId", ratingCol="rating",
               coldStartStrategy="drop", rank = j)
             model = als.fit(train_ratings)
-            #predictions = model.recommendForUserSubset(val_users, 100)
+            predictions = model.recommendForUserSubset(val_users, 100)
             #predictions.createOrReplaceTempView('predictions')
             
             
-            predictions = model.recommendForAllUsers(500)
+            #predictions = model.recommendForAllUsers(500)
             predictions.createOrReplaceTempView("predictions")
-            groundtruth = val_ratings.groupby("userId").agg(F.collect_set("movieId").alias('groundtruth'))
-            groundtruth.createOrReplaceTempView("groundtruth")
             
-            total = spark.sql("SELECT g.userId, g.groundtruth AS groundtruth, p.recommendations AS predictions FROM groundtruth g JOIN predictions p ON g.userId = p.userId")
-            total.createOrReplaceTempView("total")
+            #groundtruth = val_ratings.groupby("userId").agg(F.collect_set("movieId").alias('groundtruth'))
+            #groundtruth.createOrReplaceTempView("groundtruth")
             
-            data = total.selectExpr("predictions.movieId", "groundtruth")
-            print("df to rdd...")
-            rdd = data.rdd.map(tuple)
+            predictions = predictions.withColumn("movie_recs",col("recommendations.movieId"))
+            predictions.createOrReplaceTempView("predictions")
             
-            print("creating metrics...")
-            metrics = RankingMetrics(rdd)
-            print("meanAveragePrecision:", metrics.meanAveragePrecision)
-            print("precision at 500:", metrics.precisionAt(500))
-            print("ndcgAt 500:", metrics.ndcgAt(500))
+            predictions = predictions.drop('recommendations')
+            
+            predictions.createOrReplaceTempView("predictions")
+            
+            predictions.show()
+             
+            #total = spark.sql("SELECT g.userId, g.groundtruth AS groundtruth, p.movie_recs AS predictions FROM groundtruth g JOIN predictions p ON g.userId = p.userId")
+            #total.createOrReplaceTempView("total")
+            
+            #data = total.selectExpr("predictions.movieId", "groundtruth")
+            #print("df to rdd...")
+            #rdd = data.rdd.map(tuple)
+            
+            #print("creating metrics...")
+            #metrics = RankingMetrics(rdd)
+            #print("meanAveragePrecision:", metrics.meanAveragePrecision)
+            #print("precision at 500:", metrics.precisionAt(500))
+            #print("ndcgAt 500:", metrics.ndcgAt(500))
             
             
             #predictions_udf = udf(lambda l : [i[0] for i in l], ArrayType(IntegerType()))
             #predictions = predictions.select("userId", predictions_udf(col("recommendations")).alias('recommendations'))
             
-            predictions.show()
+            #predictions.show()
             #metrics = RankingMetrics(prediction_and_labels)
             #PK = metrics.precisionAt(100)
             #MAP = metrics.meanAveragePrecision
@@ -87,8 +97,8 @@ def main(spark, file_path):
             #print(NDCG)
             
             
-            val_ratings = val_ratings.groupBy("userId").agg(F.collect_list("movieId").alias("movieIds"))
-            val_ratings.createOrReplaceTempView('val_ratngs')
+            #val_ratings = val_ratings.groupBy("userId").agg(F.collect_list("movieId").alias("movieIds"))
+            #val_ratings.createOrReplaceTempView('val_ratngs')
             
             
             #val_pred = predictions.join(val_ratings, on='userId', how='inner').drop('userId').rdd
@@ -99,7 +109,7 @@ def main(spark, file_path):
             #eval_list = []
             #for row in val_pred.collect():
         
-                #eval_list.append((row.recommendations, row.movieIds))
+               # eval_list.append((row.recommendations, row.movieIds))
             #sc =  SparkContext.getOrCreate()
      
             #Evaluation on val
