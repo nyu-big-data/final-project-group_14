@@ -38,12 +38,12 @@ def main(spark, file_path):
     val_ratings.createOrReplaceTempView('val_ratings')
     test_ratings.createOrReplaceTempView('test_ratings')
     
-    val_users = val_ratings.select('userId').distinct()
+    test_users = test_ratings.select('userId').distinct()
 
 
     # Evaluate the model 
     
-    hyper_param_reg = [0.1]#,0.01,0.1,1]
+    hyper_param_reg = [0.01]#,0.01,0.1,1]
     hyper_param_rank = [200]#,20,100,200,400]
     for i in hyper_param_reg:
         for j in hyper_param_rank:
@@ -51,7 +51,7 @@ def main(spark, file_path):
             als = ALS(maxIter=20, regParam= i, userCol="userId", itemCol="movieId", ratingCol="rating",
               coldStartStrategy="drop", rank = j)
             model = als.fit(train_ratings)
-            predictions = model.recommendForUserSubset(val_users, 100)
+            predictions = model.recommendForUserSubset(test_users, 100)
             #predictions.createOrReplaceTempView('predictions')
             
             
@@ -72,7 +72,7 @@ def main(spark, file_path):
             #predictions_1=predictions.toPandas()
             #predictions.show()
             
-            groundtruth = val_ratings.groupby("userId").agg(F.collect_list("movieId").alias('groundtruth'))
+            groundtruth = test_ratings.groupby("userId").agg(F.collect_list("movieId").alias('groundtruth'))
             groundtruth.createOrReplaceTempView("groundtruth")
             total = spark.sql("SELECT g.userId, g.groundtruth AS groundtruth, p.movie_recs AS predictions FROM groundtruth g INNER JOIN predictions p ON g.userId = p.userId")
             total.createOrReplaceTempView("total")
@@ -125,8 +125,8 @@ def main(spark, file_path):
             metrics = RankingMetrics(predictionAndLabels)
             
             print(metrics.precisionAt(100))
-            #print(metrics.meanAveragePrecision)
-            #print(metrics.ndcgAt(100))
+            print(metrics.meanAveragePrecision)
+            print(metrics.ndcgAt(100))
 
     
     # Generate top 10 movie recommendations for each user
