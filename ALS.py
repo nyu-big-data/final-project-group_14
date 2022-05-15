@@ -48,7 +48,7 @@ def main(spark, file_path):
     for i in hyper_param_reg:
         for j in hyper_param_rank:
             
-            als = ALS(maxIter=25, regParam= i, userCol="userId", itemCol="movieId", ratingCol="rating",
+            als = ALS(maxIter=20, regParam= i, userCol="userId", itemCol="movieId", ratingCol="rating",
               coldStartStrategy="drop", rank = j)
             model = als.fit(train_ratings)
             predictions = model.recommendForUserSubset(val_users, 100)
@@ -125,8 +125,8 @@ def main(spark, file_path):
             metrics = RankingMetrics(predictionAndLabels)
             
             print(metrics.precisionAt(100))
-            print(metrics.meanAveragePrecision)
-            print(metrics.ndcgAt(100))
+            #print(metrics.meanAveragePrecision)
+            #print(metrics.ndcgAt(100))
 
     
     # Generate top 10 movie recommendations for each user
