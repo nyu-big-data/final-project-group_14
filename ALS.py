@@ -68,6 +68,7 @@ def main(spark, file_path):
             
             #predictions.createOrReplaceTempView("predictions")
             predictions.withColumn("recommendations", explode("recommendations"))
+            #predictions_1=predictions.toPandas()
             predictions.show()
              
             #total = spark.sql("SELECT g.userId, g.groundtruth AS groundtruth, p.movie_recs AS predictions FROM groundtruth g JOIN predictions p ON g.userId = p.userId")
