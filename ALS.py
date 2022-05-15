@@ -73,28 +73,22 @@ def main(spark, file_path):
             
             val_pred = predictions.join(val_ratings, on='userId', how='inner').drop('userId').rdd
             
-            val_pred.createOrReplaceTempView('val_pred')
             
-            val_pred.show()
-            
-            
-
-          
     
     
-            #eval_list = []
-            #for row in val_pred.rdd.collect():
+            eval_list = []
+            for row in val_pred.collect():
         
-                #eval_list.append((row.recommendations, row.movieIds))
-            #sc =  SparkContext.getOrCreate()
+                eval_list.append((row.recommendations, row.movieIds))
+            sc =  SparkContext.getOrCreate()
      
             #Evaluation on val
-            #predictionAndLabels = sc.parallelize(eval_list)
-            #metrics = RankingMetrics(predictionAndLabels)
+            predictionAndLabels = sc.parallelize(eval_list)
+            metrics = RankingMetrics(predictionAndLabels)
             
-            #print(metrics.precisionAt(100))
-            #print(metrics.meanAveragePrecision)
-            #print(metrics.ndcgAt(100))
+            print(metrics.precisionAt(100))
+            print(metrics.meanAveragePrecision)
+            print(metrics.ndcgAt(100))
 
     # Generate top 10 movie recommendations for each user
     #userRecs = model.recommendForAllUsers(10)
