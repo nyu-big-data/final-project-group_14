@@ -71,7 +71,7 @@ def main(spark, file_path):
             val_ratings = val_ratings.groupBy("userId").agg(F.collect_list("movieId").alias("movieIds"))
             val_ratings.createOrReplaceTempView('val_ratngs')
             
-            val_pred = predictions.join(val_ratings, on='userId', how='inner').drop('userId')
+            val_pred = predictions.join(val_ratings, on='userId', how='inner').drop('userId').rdd
             
             val_pred.createOrReplaceTempView('val_pred')
             
