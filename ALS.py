@@ -58,6 +58,7 @@ def main(spark, file_path):
             predictions_udf = udf(lambda l : [i[0] for i in l], ArrayType(IntegerType()))
             predictions = predictions.select("userId", predictions_udf(col("recommendations")).alias('recommendations'))
             
+            predictions.show()
             #metrics = RankingMetrics(prediction_and_labels)
             #PK = metrics.precisionAt(100)
             #MAP = metrics.meanAveragePrecision
@@ -71,24 +72,25 @@ def main(spark, file_path):
             val_ratings = val_ratings.groupBy("userId").agg(F.collect_list("movieId").alias("movieIds"))
             val_ratings.createOrReplaceTempView('val_ratngs')
             
-            val_pred = predictions.join(val_ratings, on='userId', how='inner').drop('userId').rdd
+            
+            #val_pred = predictions.join(val_ratings, on='userId', how='inner').drop('userId').rdd
             
             
     
     
-            eval_list = []
-            for row in val_pred.collect():
+            #eval_list = []
+            #for row in val_pred.collect():
         
-                eval_list.append((row.recommendations, row.movieIds))
-            sc =  SparkContext.getOrCreate()
+                #eval_list.append((row.recommendations, row.movieIds))
+            #sc =  SparkContext.getOrCreate()
      
             #Evaluation on val
-            predictionAndLabels = sc.parallelize(eval_list)
-            metrics = RankingMetrics(predictionAndLabels)
+            #predictionAndLabels = sc.parallelize(eval_list)
+            #metrics = RankingMetrics(predictionAndLabels)
             
-            print(metrics.precisionAt(100))
-            print(metrics.meanAveragePrecision)
-            print(metrics.ndcgAt(100))
+            #print(metrics.precisionAt(100))
+            #print(metrics.meanAveragePrecision)
+            #print(metrics.ndcgAt(100))
 
     # Generate top 10 movie recommendations for each user
     #userRecs = model.recommendForAllUsers(10)
