@@ -70,7 +70,7 @@ def main(spark, file_path):
             #predictions.withColumn("recommendations", explode("recommendations"))
             #predictions.where(col("recommendations").getItem("movieID")).show()
             #predictions_1=predictions.toPandas()
-            predictions.show()
+            #predictions.show()
             
             groundtruth = val_ratings.groupby("userId").agg(F.collect_list("movieId").alias('groundtruth'))
             groundtruth.createOrReplaceTempView("groundtruth")
@@ -79,7 +79,7 @@ def main(spark, file_path):
             
             #total = spark.sql("SELECT g.userId, g.groundtruth AS groundtruth, p.movie_recs AS predictions FROM groundtruth g JOIN predictions p ON g.userId = p.userId")
             #total.createOrReplaceTempView("total")
-            total.show()
+            #total.show()
             #data = total.selectExpr("predictions.movieId", "groundtruth")
             #print("df to rdd...")
             #rdd = data.rdd.map(tuple)
@@ -114,19 +114,19 @@ def main(spark, file_path):
             
     
     
-            #eval_list = []
-            #for row in total.rdd.collect():
+            eval_list = []
+            for row in total.rdd.collect():
         
-               #eval_list.append((row.predictions, row.groundtruth))
-            #sc =  SparkContext.getOrCreate()
+               eval_list.append((row.predictions, row.groundtruth))
+            sc =  SparkContext.getOrCreate()
      
             #Evaluation on val
-            #predictionAndLabels = sc.parallelize(eval_list)
-            #metrics = RankingMetrics(predictionAndLabels)
+            predictionAndLabels = sc.parallelize(eval_list)
+            metrics = RankingMetrics(predictionAndLabels)
             
-            #print(metrics.precisionAt(100))
-            #print(metrics.meanAveragePrecision)
-            #print(metrics.ndcgAt(100))
+            print(metrics.precisionAt(100))
+            print(metrics.meanAveragePrecision)
+            print(metrics.ndcgAt(100))
 
     
     # Generate top 10 movie recommendations for each user
