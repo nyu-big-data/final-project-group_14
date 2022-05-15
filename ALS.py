@@ -67,7 +67,7 @@ def main(spark, file_path):
             #predictions = predictions.drop('recommendations')
             
             #predictions.createOrReplaceTempView("predictions")
-            predictions.withColumn("recommendations", explode("recommendations"))
+            predictions=predictions.withColumn("recommendations", explode("recommendations"))
             #predictions_1=predictions.toPandas()
             predictions.show()
              
