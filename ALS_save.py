@@ -38,7 +38,7 @@ def main(spark, file_path):
     train_ratings.createOrReplaceTempView('train_ratings')
     val_ratings.createOrReplaceTempView('val_ratings')
     test_ratings.createOrReplaceTempView('test_ratings')
-    
+    sc =  SparkContext.getOrCreate()
 
     
     hyper_param_reg = [0.01]
@@ -49,7 +49,7 @@ def main(spark, file_path):
             als = ALS(maxIter=20, regParam= i, userCol="userId", itemCol="movieId", ratingCol="rating",
               coldStartStrategy="drop", rank = j)
             model = als.fit(train_ratings)
-            model.save(file_path)
+            model.save(sc, file_path)
             
             
             
