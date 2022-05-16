@@ -69,13 +69,13 @@ def partition(spark, file_path):
     val.orderBy('userId').groupBy('userId').count().show()
     
     #Writting them to CSVs and Parquets
-    #train.write.csv(file_path+'/ratings_train_splits.csv', header=True)
-    #val.write.csv(file_path+'/ratings_valid_splits.csv', header=True)
-    #test.write.csv(file_path+'/ratings_test_splits.csv', header=True)
+    train.write.csv(file_path+'/ratings_train_splits.csv', header=True)
+    val.write.csv(file_path+'/ratings_valid_splits.csv', header=True)
+    test.write.csv(file_path+'/ratings_test_splits.csv', header=True)
     
-    train.write.parquet(file_path+'/ratings_train_splits.parquet')
-    val.write.parquet(file_path+'/ratings_valid_splits.parquet')
-    test.write.parquet(file_path+'/ratings_test_splits.parquet')
+    #train.write.parquet(file_path+'/ratings_train_splits.parquet')
+    #val.write.parquet(file_path+'/ratings_valid_splits.parquet')
+    #test.write.parquet(file_path+'/ratings_test_splits.parquet')
     
     
 # Only enter this block if we're in main
