@@ -70,7 +70,7 @@ def main(spark, file_path):
             
             eval_list = []
             for index, row in pandasDF.iterrows():
-                eval_list.append(row['predictions'], row['groundtruth'])
+                eval_list.append((row['predictions'], row['groundtruth']))
             
     
     
