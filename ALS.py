@@ -70,10 +70,11 @@ def main(spark, file_path):
             
     
     
-            eval_list = []
-            for row in total.rdd:
+            
+            eval_list = total.rdd.map(lambda x: (x.predictions, x.groundtruth)).collect()
+            #or row in total.rdd:
         
-               eval_list.append((row.predictions.collect(), row.groundtruth.collect()))
+               #eval_list.append((row.predictions.collect(), row.groundtruth.collect()))
             sc =  SparkContext.getOrCreate()
      
             #Evaluation on val
