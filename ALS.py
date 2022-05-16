@@ -66,13 +66,17 @@ def main(spark, file_path):
             total = spark.sql("SELECT g.userId, g.groundtruth AS groundtruth, p.movie_recs AS predictions FROM groundtruth g INNER JOIN predictions p ON g.userId = p.userId")
             total.createOrReplaceTempView("total")
             
+            pandasDF = total.toPandas()
             
+            eval_list = []
+            for index, row in pandasDF.iterrows():
+                eval_list.append(row['predictions'], row['groundtruth'])
             
     
     
             
-            eval_list = total.rdd.map(lambda x: (x.predictions, x.groundtruth)).collect()
-            #or row in total.rdd:
+            #eval_list = total.rdd.map(lambda x: (x.predictions, x.groundtruth)).collect()
+            #for row in total.rdd:
         
                #eval_list.append((row.predictions.collect(), row.groundtruth.collect()))
             sc =  SparkContext.getOrCreate()
