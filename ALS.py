@@ -61,7 +61,7 @@ def main(spark, file_path):
             
             
             
-            groundtruth = test_ratings.groupby("userId").agg(F.collect_list("movieId").alias('groundtruth'))
+            groundtruth = val_ratings.groupby("userId").agg(F.collect_list("movieId").alias('groundtruth'))
             groundtruth.createOrReplaceTempView("groundtruth")
             total = spark.sql("SELECT g.userId, g.groundtruth AS groundtruth, p.movie_recs AS predictions FROM groundtruth g INNER JOIN predictions p ON g.userId = p.userId")
             total.createOrReplaceTempView("total")
