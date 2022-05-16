@@ -38,20 +38,20 @@ def main(spark, file_path):
     val_ratings.createOrReplaceTempView('val_ratings')
     test_ratings.createOrReplaceTempView('test_ratings')
     
-    test_users = test_ratings.select('userId').distinct()
+    val_users = val_ratings.select('userId').distinct()
 
 
     # Evaluate the model 
     
     hyper_param_reg = [0.01]#,0.01,0.1,1]
-    hyper_param_rank = [200]#,20,100,200,400]
+    hyper_param_rank = [10]#,20,100,200,400]
     for i in hyper_param_reg:
         for j in hyper_param_rank:
             
             als = ALS(maxIter=20, regParam= i, userCol="userId", itemCol="movieId", ratingCol="rating",
               coldStartStrategy="drop", rank = j)
             model = als.fit(train_ratings)
-            predictions = model.recommendForUserSubset(test_users, 100)
+            predictions = model.recommendForUserSubset(val_users, 100)
            
             predictions.createOrReplaceTempView("predictions")
             
