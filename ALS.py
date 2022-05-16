@@ -24,15 +24,15 @@ def main(spark, file_path):
     
     #Reading train, val and test CSVs or Parquet files.
     
-    #train_ratings = spark.read.csv(file_path+'/ratings_train_splits.csv', header = True ,schema = 'userId INT, movieId INT, rating FLOAT, timestamp INT')
-    #val_ratings = spark.read.csv(file_path+'/ratings_valid_splits.csv', header = True ,schema = 'userId INT, movieId INT, rating FLOAT, timestamp INT')
-    #test_ratings = spark.read.csv(file_path+'/ratings_test_splits.csv', header = True ,schema = 'userId INT, movieId INT, rating FLOAT, timestamp INT')
-    #ratings = spark.read.csv(file_path+'/ratings.csv', header = True ,schema = 'userId INT, movieId INT, rating FLOAT, timestamp INT')
+    train_ratings = spark.read.csv(file_path+'/ratings_train_splits.csv', header = True ,schema = 'userId INT, movieId INT, rating FLOAT, timestamp INT')
+    val_ratings = spark.read.csv(file_path+'/ratings_valid_splits.csv', header = True ,schema = 'userId INT, movieId INT, rating FLOAT, timestamp INT')
+    test_ratings = spark.read.csv(file_path+'/ratings_test_splits.csv', header = True ,schema = 'userId INT, movieId INT, rating FLOAT, timestamp INT')
+    ratings = spark.read.csv(file_path+'/ratings.csv', header = True ,schema = 'userId INT, movieId INT, rating FLOAT, timestamp INT')
     
-    train_ratings = spark.read.parquet(file_path+'/ratings_train_splits.parquet')
-    val_ratings = spark.read.parquet(file_path+'/ratings_valid_splits.parquet')
-    test_ratings = spark.read.parquet(file_path+'/ratings_test_splits.parquet')
-    ratings = spark.read.parquet(file_path+'/ratings.parquet')
+    #train_ratings = spark.read.parquet(file_path+'/ratings_train_splits.parquet')
+    #val_ratings = spark.read.parquet(file_path+'/ratings_valid_splits.parquet')
+    #test_ratings = spark.read.parquet(file_path+'/ratings_test_splits.parquet')
+    #ratings = spark.read.parquet(file_path+'/ratings.parquet')
     
     train_ratings.createOrReplaceTempView('train_ratings')
     val_ratings.createOrReplaceTempView('val_ratings')
@@ -71,9 +71,9 @@ def main(spark, file_path):
     
     
             eval_list = []
-            for row in total.rdd.collect():
+            for row in total.rdd:
         
-               eval_list.append((row.predictions, row.groundtruth))
+               eval_list.append((row.predictions.collect(), row.groundtruth.collect()))
             sc =  SparkContext.getOrCreate()
      
             #Evaluation on val
