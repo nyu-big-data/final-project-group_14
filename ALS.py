@@ -41,47 +41,40 @@ def main(spark, file_path):
     val_users = val_ratings.select('userId').distinct()
 
 
-    # Evaluate the model 
+    #Hyperparameter tuning
     
     hyper_param_reg = [0.01]#,0.01,0.1,1]
     hyper_param_rank = [10]#,20,100,200,400]
     for i in hyper_param_reg:
         for j in hyper_param_rank:
             
+            #Model building and fitting
             als = ALS(maxIter=20, regParam= i, userCol="userId", itemCol="movieId", ratingCol="rating",
               coldStartStrategy="drop", rank = j)
             model = als.fit(train_ratings)
             predictions = model.recommendForUserSubset(val_users, 100)
            
             predictions.createOrReplaceTempView("predictions")
-            
-            
             predictions = predictions.withColumn("movie_recs",col("recommendations.movieId"))
             predictions.createOrReplaceTempView("predictions")
             
             
-            
+            #Comparision with ground truth
             groundtruth = val_ratings.groupby("userId").agg(F.collect_list("movieId").alias('groundtruth'))
             groundtruth.createOrReplaceTempView("groundtruth")
             total = spark.sql("SELECT g.userId, g.groundtruth AS groundtruth, p.movie_recs AS predictions FROM groundtruth g INNER JOIN predictions p ON g.userId = p.userId")
             total.createOrReplaceTempView("total")
+            
             
             pandasDF = total.toPandas()
             
             eval_list = []
             for index, row in pandasDF.iterrows():
                 eval_list.append((row['predictions'], row['groundtruth']))
-            
-    
-    
-            
-            #eval_list = total.rdd.map(lambda x: (x.predictions, x.groundtruth)).collect()
-            #for row in total.rdd:
-        
-               #eval_list.append((row.predictions.collect(), row.groundtruth.collect()))
+           
             sc =  SparkContext.getOrCreate()
      
-            #Evaluation on val
+            #Evaluation on val and test
             predictionAndLabels = sc.parallelize(eval_list)
             metrics = RankingMetrics(predictionAndLabels)
             
@@ -90,22 +83,7 @@ def main(spark, file_path):
             print(metrics.ndcgAt(100))
 
     
-    # Generate top 10 movie recommendations for each user
-    #userRecs = model.recommendForAllUsers(10)
-    # Generate top 10 user recommendations for each movie
-    #movieRecs = model.recommendForAllItems(10)
-
-    # Generate top 10 movie recommendations for a specified set of users
-    #users = ratings.select(als.getUserCol()).distinct().limit(3)
-    #userSubsetRecs = model.recommendForUserSubset(users, 10)
-    # Generate top 10 user recommendations for a specified set of movies
-    #movies = ratings.select(als.getItemCol()).distinct().limit(3)
-    #movieSubSetRecs = model.recommendForItemSubset(movies, 10)
     
-    #userRecs.show()
-    #movieRecs.show()
-    #userSubsetRecs.show()
-    #movieSubSetRecs.show()
     
     
 
